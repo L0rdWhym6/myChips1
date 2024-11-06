@@ -8,34 +8,69 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f0f0f0;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--tg-theme-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000000);
         }
-        #coin {
-            width: 100px;
-            height: 100px;
-            background-color: gold;
-            border-radius: 50%;
-            margin: 20px;
-            cursor: pointer;
+        #game-container {
+            background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         #stats {
             display: flex;
             justify-content: space-around;
-            width: 100%;
+            margin-bottom: 20px;
+        }
+        .stat {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #coin {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            margin: 20px auto;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transition: transform 0.1s;
+        }
+        #coin:active {
+            transform: scale(0.95);
+        }
+        #boost {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #boost:hover {
+            background-color: var(--tg-theme-button-color, #2d7fcf);
         }
     </style>
 </head>
 <body>
-    <div id="stats">
-        <p>Coins: <span id="coinCount">0</span></p>
-        <p>Level: <span id="level">1</span></p>
+    <div id="game-container">
+        <div id="stats">
+            <div class="stat">Coins: <span id="coinCount">0</span></div>
+            <div class="stat">Level: <span id="level">1</span></div>
+        </div>
+        <div id="coin"></div>
+        <button id="boost">Boost (Cost: 100 coins)</button>
     </div>
-    <div id="coin"></div>
-    <button id="boost">Boost (Cost: 100 coins)</button>
     <script src="game.js"></script>
 </body>
 </html>
