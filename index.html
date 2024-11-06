@@ -15,15 +15,17 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: var(--tg-theme-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000000);
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            color: var(--tg-theme-text-color, #ffffff);
+            overflow: hidden;
         }
         #game-container {
-            background-color: var(--tg-theme-secondary-bg-color, #ffffff);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
             text-align: center;
+            backdrop-filter: blur(10px);
         }
         #stats {
             display: flex;
@@ -31,34 +33,53 @@
             margin-bottom: 20px;
         }
         .stat {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         #coin {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
             border-radius: 50%;
-            margin: 20px auto;
+            margin: 30px auto;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-            transition: transform 0.1s;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            transition: transform 0.1s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        #coin:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
         }
         #coin:active {
             transform: scale(0.95);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 1);
         }
         #boost {
-            background-color: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background: linear-gradient(45deg, #3390ec, #2d7fcf);
+            color: #ffffff;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(51, 144, 236, 0.5);
         }
         #boost:hover {
-            background-color: var(--tg-theme-button-color, #2d7fcf);
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(51, 144, 236, 0.8);
+        }
+        #boost:active {
+            transform: translateY(1px);
         }
     </style>
 </head>

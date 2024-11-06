@@ -5,7 +5,12 @@ let level = 1;
 let clickValue = 1;
 let boostCost = 100;
 
+let canvas, ctx;
+let particles = [];
+
 document.addEventListener('DOMContentLoaded', () => {
+    setupCanvas();
+    animate();
     tg.ready();
     
     const coinElement = document.getElementById('coin');
@@ -17,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         coins += clickValue;
         updateDisplay();
         animateCoinClick();
+        createCoinClickParticles(event.clientX, event.clientY);
     });
 
     boostButton.addEventListener('click', () => {
@@ -98,3 +104,72 @@ style.textContent = `
     40%, 60% { transform: translate3d(4px, 0, 0); }
 }`;
 document.head.appendChild(style);
+
+function setupCanvas() {
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.zIndex = '-1';
+    document.body.insertBefore(canvas, document.body.firstChild);
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
+function createParticle(x, y) {
+    return {
+        x,
+        y,
+        size: Math.random() * 5 + 1,
+        speedX: Math.random() * 3 - 1.5,
+        speedY: Math.random() * 3 - 1.5,
+        color: `hsl(${Math.random() * 60 + 30}, 100%, 50%)`,
+    };
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Create new background particles
+    if (particles.length < 50) {
+        particles.push(createParticle(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+
+    // Update and draw particles
+    particles.forEach((particle, index) => {
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+
+        if (particle.size > 0.2) particle.size -= 0.05;
+
+        if (particle.x < 0 || particle.x > canvas.width || particle.y < 0 || particle.y > canvas.height || particle.size <= 0.2) {
+            particles.splice(index, 1);
+        }
+
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+function createCoinClickParticles(x, y) {
+    for (let i = 0; i < 10; i++) {
+        particles.push({
+            x,
+            y,
+            size: Math.random() * 8 + 2,
+            speedX: Math.random() * 6 - 3,
+            speedY: Math.random() * 6 - 3,
+            color: `hsl(${Math.random() * 60 + 30}, 100%, 50%)`,
+        });
+    }
+}
