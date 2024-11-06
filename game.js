@@ -49,28 +49,64 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProgress();
     }
 
-    function loadProgress() {
+    async function loadProgress() {
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const userId = tg.initDataUnsafe.user.id;
-            const savedProgress = localStorage.getItem(`progress_${userId}`);
-            if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                coins = progress.coins;
-                level = progress.level;
-                clickValue = progress.clickValue;
-                boostCost = progress.boostCost;
-                updateDisplay();
+            try {
+                const response = await fetch(`https://api.telegram.org/bot8167308061:AAFjY5Wu24V-M1HzhMbshGATQ6eys5UVvYY/getGameProgress?user_id=${userId}`);
+                const data = await response.json();
+                if (data.ok && data.result) {
+                    const progress = data.result;
+                    coins = progress.coins;
+                    level = progress.level;
+                    clickValue = progress.clickValue;
+                    boostCost = progress.boostCost;
+                    updateDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading progress:', error);
             }
         }
     }
 
-    coinElement.addEventListener('click', (event) => {
+    async function saveProgress() {
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const userId = tg.initDataUnsafe.user.id;
+            const progress = {
+                coins,
+                level,
+                clickValue,
+                boostCost
+            };
+            try {
+                const response = await fetch(`https://api.telegram.org/bot8167308061:AAFjY5Wu24V-M1HzhMbshGATQ6eys5UVvYY/setGameProgress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        progress: progress
+                    }),
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error saving progress:', data.description);
+                }
+            } catch (error) {
+                console.error('Error saving progress:', error);
+            }
+        }
+    }
+
+    coinElement.addEventListener('click', async (event) => {
         coins += clickValue;
         updateDisplay();
         animateCoinClick();
         createCoinClickParticles(event.clientX, event.clientY);
         const rect = coinElement.getBoundingClientRect();
         createFloatingNumber(rect.left + rect.width / 2, rect.top + rect.height / 2, clickValue);
+        await saveProgress();
     });
 
     function createFloatingNumber(x, y, value) {
@@ -98,73 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
 
-    boostButton.addEventListener('click', () => {
-        if (coins >= boostCost) {
-            coins -= boostCost;
-            clickValue *= 2;
-            boostCost *= 2;
-            level++;
-            updateDisplay();
-            boostButton.textContent = `Boost (Cost: ${boostCost} coins)`;
-            animateBoost();
-        } else {
-            shakeButton();
-        }
-    });
-
-    function updateDisplay() {
-        coinCountElement.textContent = formatNumber(coins);
-        levelElement.textContent = level;
+boostButton.addEventListener('click', async () => {
+    if (coins >= boostCost) {
+        coins -= boostCost;
+        clickValue++;
+        level++;
+        boostCost = Math.floor(boostCost * 1.5);
+        updateDisplay();
+        boostButton.classList.add('boost-animation');
+        await saveProgress();
     }
-
-    function animateCoinClick() {
-        coinElement.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-            coinElement.style.transform = 'scale(1)';
-        }, 100);
-    }
-
-    function animateBoost() {
-        boostButton.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-            boostButton.style.transform = 'scale(1)';
-        }, 100);
-    }
-
-    function shakeButton() {
-        boostButton.style.animation = 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both';
-        boostButton.addEventListener('animationend', () => {
-            boostButton.style.animation = '';
-        });
-    }
-
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    // Load saved progress
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const userId = tg.initDataUnsafe.user.id;
-        const savedProgress = localStorage.getItem(`progress_${userId}`);
-        if (savedProgress) {
-            const progress = JSON.parse(savedProgress);
-            coins = progress.coins;
-            level = progress.level;
-            clickValue = progress.clickValue;
-            boostCost = progress.boostCost;
-            updateDisplay();
-            boostButton.textContent = `Boost (Cost: ${boostCost} coins)`;
-        }
-    }
-
-    // Save progress when closing the game
-    window.addEventListener('beforeunload', () => {
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const userId = tg.initDataUnsafe.user.id;
-            const progress = { coins, level, clickValue, boostCost };
-            localStorage.setItem(`progress_${userId}`, JSON.stringify(progress));
-        }
-    });
 });
 
 // Add this CSS to your HTML file or create a new style tag
