@@ -174,9 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     animate();
     tg.ready();
     
-    const authContainer = document.getElementById('auth-container');
-    const gameContainer = document.getElementById('game-container');
-    const loginButton = document.getElementById('login-button');
     const coinElement = document.getElementById('coin');
     const coinCountElement = document.getElementById('coinCount');
     const levelElement = document.getElementById('level');
@@ -228,82 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateDisplay();
 
-    // Check if user is already logged in
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        showGame();
-    } else {
-        showAuth();
-    }
-
-    loginButton.addEventListener('click', () => {
-        tg.expand();
-    });
-
-    tg.onEvent('viewportChanged', () => {
-        if (tg.isExpanded) {
-            showGame();
-        }
-    });
-
-    function showAuth() {
-        authContainer.style.display = 'block';
-        gameContainer.style.display = 'none';
-    }
-
-    function showGame() {
-        authContainer.style.display = 'none';
-        gameContainer.style.display = 'block';
-        loadProgress();
-    }
-
-    function loadProgress() {
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const userId = tg.initDataUnsafe.user.id;
-            const savedProgress = localStorage.getItem(`progress_${userId}`);
-            if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                coins = progress.coins;
-                level = progress.level;
-                clickValue = progress.clickValue;
-                boostCost = progress.boostCost;
-                updateDisplay();
-            }
-        }
-    }
-
-    coinElement.addEventListener('click', (event) => {
+    coinElement.addEventListener('click', () => {
         coins += clickValue;
         updateDisplay();
         animateCoinClick();
         createCoinClickParticles(event.clientX, event.clientY);
-        const rect = coinElement.getBoundingClientRect();
-        createFloatingNumber(rect.left + rect.width / 2, rect.top + rect.height / 2, clickValue);
     });
-
-    function createFloatingNumber(x, y, value) {
-        const floatingNumber = document.createElement('div');
-        floatingNumber.className = 'floating-number';
-        floatingNumber.textContent = `+${value}`;
-        const offsetX = (Math.random() - 0.5) * 40; // Random horizontal offset
-        const offsetY = (Math.random() - 0.5) * 40; // Random vertical offset
-        floatingNumber.style.left = `${x + offsetX}px`;
-        floatingNumber.style.top = `${y + offsetY}px`;
-        document.body.appendChild(floatingNumber);
-
-        // Trigger the animation
-        setTimeout(() => {
-            floatingNumber.style.transform = `translateY(-100px)`;
-            floatingNumber.style.opacity = '1';
-        }, 0);
-
-        // Remove the element after animation
-        setTimeout(() => {
-            floatingNumber.style.opacity = '0';
-            setTimeout(() => {
-                document.body.removeChild(floatingNumber);
-            }, 500);
-        }, 1500);
-    }
 
     boostButton.addEventListener('click', () => {
         if (coins >= boostCost) {
